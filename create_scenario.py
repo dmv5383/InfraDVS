@@ -8,7 +8,7 @@ def parse_arguments():
     parser.add_argument("--world_map", type=str, default="Town10HD", help="The world map to use.")
     parser.add_argument("--world_weather", type=str, default="ClearNoon", help="The weather condition to use.")
     parser.add_argument("--run_number", type=int, default=1, help="The run number for the scenario.")
-    parser.add_argument("--out_path", type=str, default="/home/carla/datasets/scenarios/", help="The output path for the scenario log.")
+    parser.add_argument("--out_path", type=str, default="datasets/data/", help="The output path for the LIDAR sensor.")
     parser.add_argument("--record_start_time", type=int, default=10, help="How long into the simulation the recording begins.")
     parser.add_argument("--record_delta_time", type=int, default=60, help="The length of the recording.")
     parser.add_argument("--num_vehicles", type=int, default=20, help="The number of vehicles in the scenario.")
@@ -23,7 +23,7 @@ if __name__ == "__main__":
     world_weather = args.world_weather
     run_number = args.run_number
     out_path = args.out_path
-    file_name = f"{world_map}_{world_weather}_{run_number}.log"
+    file_name = f"{world_map}_{world_weather}_{run_number}"
     file_path = os.path.join(out_path, file_name)
     record_start_time = args.record_start_time
     record_delta_time = args.record_delta_time
