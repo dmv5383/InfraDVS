@@ -1,3 +1,4 @@
 create_out.log
 __pycache__/
-datasets/
+datasets/data/
+datasets/scenarios/
