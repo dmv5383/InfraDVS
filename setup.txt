@@ -24,7 +24,8 @@ Create scenario
 - Set record_delta_time
 - Set num_vehicles
 - Set num_peds
-- python3 ./create_scenario.py
+- conda activate CARLA2
+- python3 ./create_scenario.py --world_map {map_name} --world_weather {world_weather} --run_number {run_number} --record_start_time 1.0 --record_delta_time {recording_length} --num_vehicles {num_vehicles} --num_peds {num_pedestrians} --out_path datasets/data/
 - sudo docker cp {container_name}:/home/carla/datasets/ /data/CARLA_DVS_Scripts/InfraDVS/
 
 Restart Docker container
@@ -33,7 +34,7 @@ Restart Docker container
 Read scenario
 - Configure sensors
     - sensor actor must match vehicle role name from create_scenario
-    - Lidar transform is overridden to be on top of the vehicle
+    - LIDAR doesn't work in read mode - Only use cameras
 - Set record_path (path in docker container)
   - Recording must already exist in docker container or needs to be copied
 - Set record_delta_time
@@ -45,7 +46,6 @@ Read scenario
       rename the data directory created from the previous run
     - Always restart the Docker container between runs or if there is a timeout error
 - Restart Docker container
-- python3 ./read_scenario.py (with lidar_sensors.json) (tick_rate = 0.1)
 
 Kill the Docker container
 - sudo docker container kill {container_name}
@@ -53,3 +53,4 @@ Kill the Docker container
 
 To call the script use:
 - sudo bash ./gen_data/gen_data.sh ./gen_data/scenario_config.txt
+  - Need's to be changed
