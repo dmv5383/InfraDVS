@@ -1,0 +1,27 @@
+[
+    {
+        "name": "car_lidar",
+        "type": "sensor.lidar.ray_cast",
+        "options": {
+            "upper_fov": "21.2",
+            "lower_fov": "-21.2",
+            "channels": "128",
+            "range": "200",
+            "points_per_second": "5242880",
+            "rotation_frequency": "10",
+            "sensor_tick": "0"
+        },
+        "transform": {
+            "location": {
+                "x": 2.8,
+                "z": 1.8
+            },
+            "rotation": {
+                "pitch": 15
+            }
+        },
+        "converter": null,
+        "actor": "ego_vehicle",
+        "is_static": false
+    }
+]
