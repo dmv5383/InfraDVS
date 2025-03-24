@@ -28,7 +28,7 @@ Create scenario
 - Set num_peds
 - conda activate CARLA2
 - python3 ./create_scenario.py --world_map {map_name} --world_weather {world_weather} --run_number {run_number} --record_start_time 1.0 --record_delta_time {recording_length} --num_vehicles {num_vehicles} --num_peds {num_pedestrians} --out_path datasets/data/
-- sudo docker cp {container_name}:/home/carla/datasets/ /data/CARLA_DVS_Scripts/InfraDVS/
+- sudo docker cp {container_name}:/home/carla/datasets/ /data/InfraDVS/
 
 Restart Docker container
 - sudo docker container restart {container_name}

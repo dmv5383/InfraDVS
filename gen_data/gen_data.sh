@@ -4,22 +4,24 @@
 
 # Function to create a scenario
 create_scenario() {
-    python3 ./create_scenario.py --world_map "$1" --world_weather "$2" --run_number "$3" --record_start_time "$4" --record_delta_time "$5" --num_vehicles "$6" --num_peds "$7"
+    conda activate CARLA2
+    python3 ./create_scenario.py --world_map "$1" --world_weather "$2" --run_number "$3" --record_start_time "$4" --record_delta_time "$5" --num_vehicles "$6" --num_peds "$7" --out_path datasets/data/
     sleep 5
-    sudo docker cp ${container_name}:/home/carla/datasets/scenarios /home/dmv5383/CARLA_DVS_Scripts/InfraDVS/datasets/
+    sudo docker cp ${container_name}:/home/carla/datasets/ /data/CARLA_DVS_Scripts/InfraDVS/
     sudo docker container restart ${container_name}
     sleep 5
 }
 
 # Function to read a scenario
 read_scenario() {
+    conda activate CARLA2
     local tick_rate
     if [[ "$5" == "./gen_data/camera_sensors.json" ]]; then
         tick_rate=0.001
     else
         tick_rate=0.1
     fi
-    python3 ./read_scenario.py --world_map "$1" --world_weather "$2" --record_delta_time "$3" --start_time "$4" --sensors_config "$5" --record_path "$6" --tick_rate "$tick_rate"
+    python3 ./read_scenario.py --world_map "$1" --world_weather "$2" --record_delta_time "$3" --start_time "$4" --sensors_config "$5" --record_path "$6" --tick_rate "$tick_rate" --out_path datasets/data/
     sleep 5
     sudo docker container restart ${container_name}
     sleep 5
@@ -89,7 +91,7 @@ for wm in "${world_map[@]}"; do
                                 read_scenario "$wm" "$ww" "$rdt" "$st" "./gen_data/camera_sensors.json" "$record_path"
 
                                 # Run read_scenario with lidar_sensors.json
-                                read_scenario "$wm" "$ww" "$rdt" "$st" "./gen_data/lidar_sensors.json" "$record_path"
+                                #read_scenario "$wm" "$ww" "$rdt" "$st" "./gen_data/lidar_sensors.json" "$record_path"
                             done
                         done
                     done
