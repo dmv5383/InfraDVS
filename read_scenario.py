@@ -10,7 +10,7 @@ def parse_args():
     parser.add_argument("--world_map", type=str, required=True, help="World map to load in CARLA.")
     parser.add_argument("--world_weather", type=str, required=True, help="Weather preset to use in CARLA.")
     parser.add_argument("--record_delta_time", type=int, required=True, help="Delta time for recording.")
-    parser.add_argument("--out_path", type=str, default="/home/dmv5383/CARLA_DVS_Scripts/InfraDVS/datasets/data/", help="Output path for data.")
+    parser.add_argument("--out_path", type=str, default="datasets/data/", help="Output path for data.")
     parser.add_argument("--start_time", type=float, default=0.0, help="Start time for the scenario.")
     parser.add_argument("--tick_rate", type=float, default=0.1, help="Tick rate for the scenario.")
     parser.add_argument("--sensors_config", type=str, required=True, help="Path to the JSON file containing sensor configuration.")
