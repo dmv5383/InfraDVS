@@ -11,6 +11,8 @@ Get name of Docker container
 - sudo docker ps
 
 Create directory in Docker container (Requires separate terminal)
+- sudo docker exec {container_name} mkdir -p /home/carla/datasets/scenarios
+OR
 - sudo docker exec -t -i {container_name} /bin/bash
 - mkdir datasets
 - mkdir datasets/scenarios
