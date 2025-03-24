@@ -9,6 +9,7 @@ class CreateScenario():
         self,
         client: Any,
         out_path: str,
+        record_path: str,
         world_map: str,
         world_weather: str,
         vehicles: List[Dict],
@@ -44,6 +45,7 @@ class CreateScenario():
         scenario_creator = ScenarioCreator(
             client=client,
             out_path=out_path,
+            record_path=record_path,
             start_time=0.0,
             tick_rate=0.001,
             world_map=world_map,

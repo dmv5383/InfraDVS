@@ -25,6 +25,7 @@ if __name__ == "__main__":
     out_path = args.out_path
     file_name = f"{world_map}_{world_weather}_{run_number}"
     file_path = os.path.join(out_path, file_name)
+    record_file_path = "/home/carla/datasets/scenarios/" + file_name + ".log"
     record_start_time = args.record_start_time
     record_delta_time = args.record_delta_time
     num_vehicles = args.num_vehicles
@@ -42,7 +43,7 @@ if __name__ == "__main__":
     #    os.makedirs(out_path)
 
     create_scenario = CreateScenario(
-        client=client, out_path=file_path, world_map=world_map,
+        client=client, out_path=file_path, record_path=record_file_path, world_map=world_map,
         world_weather=world_weather, vehicles=vehicles,
         num_traffic_vehicles=num_vehicles, num_traffic_peds=num_peds,
         record_start_time=record_start_time, record_delta_time=record_delta_time
