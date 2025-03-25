@@ -4,17 +4,18 @@
 
 # Function to create a scenario
 create_scenario() {
-    conda activate CARLA2
+    #conda activate CARLA2
+    echo "hi"
     python3 ./create_scenario.py --world_map "$1" --world_weather "$2" --run_number "$3" --record_start_time "$4" --record_delta_time "$5" --num_vehicles "$6" --num_peds "$7" --out_path datasets/data/
     sleep 5
-    sudo docker cp ${container_name}:/home/carla/datasets/ /data/CARLA_DVS_Scripts/InfraDVS/
+    sudo docker cp ${container_name}:/home/carla/datasets/ /data/InfraDVS/
     sudo docker container restart ${container_name}
     sleep 5
 }
 
 # Function to read a scenario
 read_scenario() {
-    conda activate CARLA2
+    #conda activate CARLA2
     local tick_rate
     if [[ "$5" == "./gen_data/camera_sensors.json" ]]; then
         tick_rate=0.001
@@ -28,8 +29,8 @@ read_scenario() {
 }
 
 # Activate conda environment
-source ~/miniconda3/etc/profile.d/conda.sh
-conda activate CARLA2
+#source ~/miniconda3/etc/profile.d/conda.sh
+#conda activate CARLA2
 
 # Read input file
 input_file="$1"
@@ -42,8 +43,8 @@ fi
 container_name=$(sudo docker ps --format "{{.Names}}")
 
 # Create necessary directories inside the Docker container
-sudo docker exec ${container_name} mkdir -p /home/carla/datasets/scenarios
-sudo docker exec ${container_name} chmod -R 777 /home/carla/datasets
+#sudo docker exec ${container_name} mkdir -p /home/carla/datasets/scenarios
+#sudo docker exec ${container_name} chmod -R 777 /home/carla/datasets
 
 # Initialize variables with default values
 world_map=("Town10HD")

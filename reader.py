@@ -48,20 +48,6 @@ class ScenarioReader(ScenarioBase):
         # TODO: Create mapping for different writers
         pass
 
-    def _save_sensor_props(self) -> None:
-        print("# ===== Saving Sensor Properties ===== #")
-        self.save_json(os.path.join(self.out_path, "sensor_props.json"), self.sensors)
-        print("# ===== Sensor Properties Saved ====== #")
-
-    def save_json(self, path: str, sensor_info: Dict) -> None:
-        def transform_to_dict(obj):
-            if isinstance(obj, carla.Transform):
-                return obj.get_matrix()
-            raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
-
-        with open(path, "w") as json_file:
-            json_file.write(json.dumps(sensor_info, default=transform_to_dict, indent=2))
-
     def create_dir(self, path: str) -> str:
         if not os.path.exists(path):
             os.makedirs(path)

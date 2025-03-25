@@ -54,5 +54,5 @@ Kill the Docker container
 
 
 To call the script use:
-- sudo bash ./gen_data/gen_data.sh ./gen_data/scenario_config.txt
+- bash ./gen_data/gen_data.sh ./gen_data/scenario_config.txt
   - Need's to be changed

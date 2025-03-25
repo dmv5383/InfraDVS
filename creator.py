@@ -40,6 +40,7 @@ class ScenarioCreator(ScenarioBase):
         self._init_vehicles()
         self._init_sensors()
         self._init_writer()
+        self._save_sensor_props()
         
     def _init_vehicles(self) -> None:
         self.vehicle_spawner = VehicleSpawner(client=self.client, world=self.world)
