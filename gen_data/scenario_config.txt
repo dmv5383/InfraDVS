@@ -1,6 +1,6 @@
 world_map=Town10HD
 world_weather=ClearNoon,HardRainSunset
-run_number=0
+run_number=123
 record_start_time=0
 record_delta_time=1
 num_vehicles=25
