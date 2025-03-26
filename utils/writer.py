@@ -66,7 +66,9 @@ class Writer:
         events_image = events_image.astype(np.uint8)
         return events_image
 
-    def write_rgb(self, sensor: Any, sensor_path: str, image: np.ndarray, frame: int, world: Any) -> None:
+    def write_rgb(self, sensor: Any, sensor_path: str, sensor_data: np.ndarray, frame: int, world: Any) -> None:
+        (image, depth) = sensor_data
+
         frame_str = f"{frame:08d}"
         img_output_file = os.path.join(sensor_path, f"{frame_str}_img.png")
         bbox_output_file = os.path.join(sensor_path, f"{frame_str}_bboxes.json")
@@ -74,12 +76,14 @@ class Writer:
         height = image.shape[0]
         width = image.shape[1]
 
-        bboxes = get_bboxes_2d(sensor, world)
+        bboxes = get_bboxes_2d(sensor, depth, world)
 
         cv2.imwrite(img_output_file, image)
         self.save_coco_format(bboxes, bbox_output_file, frame, f"{frame_str}_img.png", width, height)
 
-    def write_events(self, sensor: Any, sensor_path: str, events: np.ndarray, frame: int, world: Any) -> None:
+    def write_events(self, sensor: Any, sensor_path: str, sensor_data: np.ndarray, frame: int, world: Any) -> None:
+        (events, depth) = sensor_data
+
         frame_str = f"{frame:08d}"
         events_output_file = os.path.join(sensor_path, f"{frame_str}_events.npz")
         img_output_file = os.path.join(sensor_path, f"{frame_str}_events_img.png")
@@ -89,7 +93,7 @@ class Writer:
         height = int(sensor.attributes.get("image_size_y"))
 
         events_image = self.generate_events_image(events, width, height)
-        bboxes = get_bboxes_2d(sensor, world)
+        bboxes = get_bboxes_2d(sensor, depth, world)
 
         np.savez_compressed(events_output_file, dvs_events=events)
         cv2.imwrite(img_output_file, events_image)
@@ -145,13 +149,14 @@ class Writer:
                 {"id": 7, "name": "bus", "supercategory": "vehicle"}
             ]
         }
-        for obj_id, class_name, bbox in bounding_boxes:
+        for obj_id, class_name, bbox_2d, bbox_3d in bounding_boxes:
             coco_data["annotations"].append({
                 "id": obj_id,
                 "image_id": id,
                 "category_id": coco[class_name],
-                "bbox": bbox,
-                "area": bbox[2] * bbox[3],
+                "bbox_2d": bbox_2d,
+                "area": bbox_2d[2] * bbox_2d[3],
+                "bbox_3d": bbox_3d,
                 "iscrowd": 0,
                 "segmentation": [],
             })

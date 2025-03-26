@@ -146,5 +146,7 @@ class ScenarioBase():
 
     def _destroy_sensors(self) -> None:
         for sensor in self.active_sensors:
+            if sensor.get_type() != "sensor.lidar.ray_cast":
+                sensor.depth_camera.get_obj().destroy()
             sensor.get_obj().destroy()
         print('Destroyed Sensors')

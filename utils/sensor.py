@@ -48,9 +48,35 @@ class Sensor():
         for option in self.options.keys():
             self.sensor_bp.set_attribute(option, self.options[option])
 
-        if self.type == "sensor.lidar.ray_cast" and not self.is_static:
-            hp = max(self.actor.bounding_box.extent.x,self.actor.bounding_box.extent.y)*np.tan(np.radians(-float(self.sensor_bp.get_attribute("lower_fov"))))
-            self.transform = carla.Transform(carla.Location(z=2*self.actor.bounding_box.extent.z+hp))
+        self.depth_camera = None
+        # Place lidar on top of vehicle if not static
+        if self.type == "sensor.lidar.ray_cast":
+            if not self.is_static:
+                hp = max(self.actor.bounding_box.extent.x,self.actor.bounding_box.extent.y)*np.tan(np.radians(-float(self.sensor_bp.get_attribute("lower_fov"))))
+                self.transform = carla.Transform(carla.Location(z=2*self.actor.bounding_box.extent.z+hp))
+        # Add additional depth sensor for all cameras
+        elif self.type != "sensor.camera.depth":
+            depth_sensor_dict = {
+                "name": f"{self.name}_depth",
+                "type": "sensor.camera.depth",
+                "options": {
+                    "image_size_x": f"{self.sensor_bp.get_attribute('image_size_x').as_int()}",
+                    "image_size_y": f"{self.sensor_bp.get_attribute('image_size_y').as_int()}",
+                    "fov": f"{self.sensor_bp.get_attribute('fov').as_float():.2f}",
+                    "sensor_tick": f"{self.sensor_bp.get_attribute('sensor_tick').as_float():.4f}"
+                },
+                "transform": self.transform,
+                "is_static": self.is_static,
+                "converter": self.converter
+            }
+            
+            # Add actor attribute if the camera is not static
+            if not self.is_static:
+                depth_sensor_dict["actor"] = self.sensor["actor"]
+                
+            self.depth_camera = Sensor(world=self.world, tick_rate=self.tick_rate, sensor=depth_sensor_dict)
+            self.depth_queue = queue.Queue()
+            self.depth_camera.get_obj().listen(self.depth_queue.put)
 
         if self.is_static:
             self.sensor_obj = self.world.spawn_actor(
@@ -113,4 +139,13 @@ class Sensor():
             if self.frame_count % self.parsing_freq == 0:
                 data = self._parse_data(world_frame, sensor_queue, timeout)
             self.frame_count += 1
-        return data
+
+        if self.depth_camera is not None:
+            depth_data = self.depth_camera.read_data(world_frame, self.depth_queue, timeout)
+            if data is not None and depth_data is not None:
+                return (data, depth_data)
+            elif data is not None:
+                print("Warning: Depth data not available.")
+                return None
+        else:
+            return data

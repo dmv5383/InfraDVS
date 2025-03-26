@@ -46,7 +46,7 @@ class CreateScenario():
             client=client,
             out_path=out_path,
             record_path=record_path,
-            start_time=0.0,
+            start_time=record_start_time,
             tick_rate=0.001,
             world_map=world_map,
             world_weather=world_weather,

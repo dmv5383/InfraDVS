@@ -64,7 +64,7 @@ class ScenarioReader(ScenarioBase):
                 start_time=self.start_time, tick_rate=self.tick_rate
             ) as sensor_sync:
                 while True:
-                    data = sensor_sync.tick(timeout=2.0)
+                    data = sensor_sync.tick(timeout=5.0)
                     print("=====", "Frame ID:", data["world"], "=====")
                     data = self._extract_data(data)
                     self._print_data(data)
