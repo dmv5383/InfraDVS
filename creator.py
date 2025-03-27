@@ -17,6 +17,7 @@ class ScenarioCreator(ScenarioBase):
             self,
             client: Any,
             out_path: str,
+            record_path:str,
             vehicles: List[Dict],
             num_traffic_vehicles: int = None,
             num_traffic_peds: int = None,
@@ -30,6 +31,7 @@ class ScenarioCreator(ScenarioBase):
             client=client, simulation_mode="create", out_path=out_path, start_time=start_time,
             tick_rate=tick_rate, **kwargs
         )
+        self.record_path = record_path
         self.vehicles = vehicles
         self.num_traffic_vehicles = num_traffic_vehicles
         self.num_traffic_peds = num_traffic_peds
@@ -38,6 +40,7 @@ class ScenarioCreator(ScenarioBase):
         self._init_vehicles()
         self._init_sensors()
         self._init_writer()
+        self._save_sensor_props()
         
     def _init_vehicles(self) -> None:
         self.vehicle_spawner = VehicleSpawner(client=self.client, world=self.world)
@@ -70,7 +73,7 @@ class ScenarioCreator(ScenarioBase):
                     # Start recording
                     if self.sim_time > self.record_start_time and (
                         self.record_flag == False and self.end_record_flag == False):
-                        self.client.start_recorder("/home/carla/datasets/scenarios/", True)
+                        self.client.start_recorder(self.record_path, True)
                         self.record_flag = True
                     # Stop recording
                     if self.sim_time > (

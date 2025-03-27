@@ -4,32 +4,45 @@
 
 # Function to create a scenario
 create_scenario() {
-    conda activate CARLA2
-    python3 ./create_scenario.py --world_map "$1" --world_weather "$2" --run_number "$3" --record_start_time "$4" --record_delta_time "$5" --num_vehicles "$6" --num_peds "$7" --out_path datasets/data/
-    sleep 5
-    sudo docker cp ${container_name}:/home/carla/datasets/ /data/CARLA_DVS_Scripts/InfraDVS/
     sudo docker container restart ${container_name}
+    sleep 5
+    create_output=$(python3 ./create_scenario.py --world_map "$1" --world_weather "$2" --run_number "$3" --record_start_time "$4" --record_delta_time "$5" --num_vehicles "$6" --num_peds "$7" --out_path datasets/data/ 2>&1)
+    search_string="RuntimeError"
+    while echo "$create_output" | grep -q "$search_string"; do
+        echo "Error creating scenario, trying again"
+        sudo docker container restart ${container_name}
+        sleep 5
+        create_output=$(python3 ./create_scenario.py --world_map "$1" --world_weather "$2" --run_number "$3" --record_start_time "$4" --record_delta_time "$5" --num_vehicles "$6" --num_peds "$7" --out_path datasets/data/ 2>&1)
+    done 
+    sleep 5
+    sudo docker cp ${container_name}:/home/carla/datasets/ /data/InfraDVS/
     sleep 5
 }
 
 # Function to read a scenario
 read_scenario() {
-    conda activate CARLA2
     local tick_rate
     if [[ "$5" == "./gen_data/camera_sensors.json" ]]; then
         tick_rate=0.001
     else
         tick_rate=0.1
     fi
-    python3 ./read_scenario.py --world_map "$1" --world_weather "$2" --record_delta_time "$3" --start_time "$4" --sensors_config "$5" --record_path "$6" --tick_rate "$tick_rate" --out_path datasets/data/
-    sleep 5
     sudo docker container restart ${container_name}
+    sleep 5
+    read_output=$(python3 ./read_scenario.py --world_map "$1" --world_weather "$2" --record_delta_time "$3" --start_time "$4" --sensors_config "$5" --record_path "$6" --tick_rate "$tick_rate" --out_path datasets/data/)
+    search_string="RuntimeError"
+    while echo "$read_output" | grep -q "$search_string"; do
+        echo "Error reading scenario, trying again"
+        sudo docker container restart ${container_name}
+        sleep 5
+        read_output=$(python3 ./read_scenario.py --world_map "$1" --world_weather "$2" --record_delta_time "$3" --start_time "$4" --sensors_config "$5" --record_path "$6" --tick_rate "$tick_rate" --out_path datasets/data/)    done 
+    done
     sleep 5
 }
 
 # Activate conda environment
-source ~/miniconda3/etc/profile.d/conda.sh
-conda activate CARLA2
+#source ~/miniconda3/etc/profile.d/conda.sh
+#conda activate CARLA2
 
 # Read input file
 input_file="$1"
@@ -42,8 +55,8 @@ fi
 container_name=$(sudo docker ps --format "{{.Names}}")
 
 # Create necessary directories inside the Docker container
-sudo docker exec ${container_name} mkdir -p /home/carla/datasets/scenarios
-sudo docker exec ${container_name} chmod -R 777 /home/carla/datasets
+#sudo docker exec ${container_name} mkdir -p /home/carla/datasets/scenarios
+#sudo docker exec ${container_name} chmod -R 777 /home/carla/datasets
 
 # Initialize variables with default values
 world_map=("Town10HD")

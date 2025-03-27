@@ -44,6 +44,8 @@ Read scenario
 - Set tick_rate
 - Set out_path
 - python3 ./read_scenario.py (with camera_sensors.json) (tick_rate = 0.001)
+  - Defualt values:
+  - python3 ./read_scenario.py --world_map Town10HD --world_weather ClearNoon --record_delta_time {recording_length} --start_time 0.04 --tick_rate 0.001 --sensors_config gen_data/camera_sensors.json --record_path /home/carla/datasets/scenarios/Town10HD_ClearNoon_{run_number}.log
     - If you need to rerun the same recording (same sensors), then you must delete or 
       rename the data directory created from the previous run
     - Always restart the Docker container between runs or if there is a timeout error
@@ -54,5 +56,5 @@ Kill the Docker container
 
 
 To call the script use:
-- sudo bash ./gen_data/gen_data.sh ./gen_data/scenario_config.txt
+- bash ./gen_data/gen_data.sh ./gen_data/scenario_config.txt
   - Need's to be changed

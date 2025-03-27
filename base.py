@@ -1,3 +1,5 @@
+import json
+import os
 import carla
 import time
 
@@ -101,6 +103,40 @@ class ScenarioBase():
     def _save_data(self, data: Dict[str, Any], frame: int, world: Any) -> None:
         self.writer.write_frame(data=data, frame=frame, world=world)
 
+    def _save_sensor_props(self) -> None:
+        print("# ===== Saving Sensor Properties ===== #")
+        self.save_json(os.path.join(self.out_path, "sensor_props.json"), self.sensors)
+        print("# ===== Sensor Properties Saved ====== #")
+
+    def save_json(self, path: str, sensor_info: Dict) -> None:
+        def transform_to_dict(obj):
+            if isinstance(obj, carla.Transform):
+                return obj.get_matrix()
+            raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
+
+        # If file exists, load existing content and update
+        existing_data = []
+        if os.path.exists(path):
+            try:
+                with open(path, "r") as json_file:
+                    existing_data = json.load(json_file)
+                
+                # Convert to list if it's not already
+                if not isinstance(existing_data, list):
+                    existing_data = [existing_data]
+            except:
+                pass  # If file exists but can't be parsed, we'll just overwrite
+
+        # Make sure sensor_info is in a list format
+        if isinstance(sensor_info, list):
+            updated_data = existing_data + sensor_info
+        else:
+            existing_data.append(sensor_info)
+            updated_data = existing_data
+            
+        with open(path, "w") as json_file:
+            json_file.write(json.dumps(updated_data, default=transform_to_dict, indent=2))
+
     def loop(self) -> None:
         raise NotImplementedError
 
@@ -110,5 +146,7 @@ class ScenarioBase():
 
     def _destroy_sensors(self) -> None:
         for sensor in self.active_sensors:
+            if sensor.get_type() != "sensor.lidar.ray_cast":
+                sensor.depth_camera.get_obj().destroy()
             sensor.get_obj().destroy()
         print('Destroyed Sensors')

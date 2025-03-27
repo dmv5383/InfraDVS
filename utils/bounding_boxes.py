@@ -222,7 +222,7 @@ class ClientSideBoundingBoxes(object):
         cords[7, :] = np.array([extent.x, -extent.y, extent.z, 1])
         return cords
 
-def get_bboxes_2d(sensor: Any, world: Any) -> List:
+def get_bboxes_2d(sensor: Any, depth: np.ndarray, world: Any) -> List:
     vehicles = world.get_actors().filter("vehicle.*")
     pedestrians = world.get_actors().filter("walker.*")
 
@@ -241,8 +241,18 @@ def get_bboxes_2d(sensor: Any, world: Any) -> List:
             np.array(points, dtype=np.int32)
         )
         vehicle = bbox[1]
-        bounding_boxes.append((vehicle.id, vehicle.attributes.get("base_type"),
-                                (min_x, min_y, xdiff, ydiff)))
+        
+        # Check for occlusion
+        occlusion_status = check_occlusion(points, bbox[0][:, 2], depth, min_x, min_y, xdiff, ydiff)
+        
+        if occlusion_status < 2:
+            # Only add bounding box if it's not largely occluded
+            bounding_boxes.append((vehicle.id, vehicle.attributes.get("base_type"),
+                                (min_x, min_y, xdiff, ydiff), 
+                                [(int(bbox[0][i, 0]), int(bbox[0][i, 1]), int(bbox[0][i,2])) for i in range(8)]))
+            #print(f"Vehicle {vehicle.id} is visible, adding bounding box.")
+        #else:
+            #print(f"Vehicle {vehicle.id} is largely occluded, skipping bounding box.")
         
     ped_bboxes = ClientSideBoundingBoxes.get_bounding_boxes(
         vehicles=pedestrians,
@@ -257,9 +267,107 @@ def get_bboxes_2d(sensor: Any, world: Any) -> List:
             np.array(points, dtype=np.int32)
         )
         ped = bbox[1]
-        bounding_boxes.append((ped.id, "pedestrian",
-                                (min_x, min_y, xdiff, ydiff)))
+        
+        # Check for occlusion
+        occlusion_status = check_occlusion(points, bbox[0][:, 2], depth, min_x, min_y, xdiff, ydiff)
+        
+        if occlusion_status < 2:
+            # Only add bounding box if it's not largely occluded
+            bounding_boxes.append((ped.id, "pedestrian",
+                                (min_x, min_y, xdiff, ydiff),
+                                [(int(bbox[0][i, 0]), int(bbox[0][i, 1]), int(bbox[0][i,2])) for i in range(8)]))
+            #print(f"Pedestrian {ped.id} is visible, adding bounding box.")
+        #else:
+            #print(f"Pedestrian {ped.id} is largely occluded, skipping bounding box.")
     return bounding_boxes
+
+def check_occlusion(points, z_values, depth_map, min_x, min_y, width, height):
+    """
+    Determines if an object is occluded based on depth information.
+    
+    Parameters:
+    points (list): List of 2D points representing the bounding box corners
+    z_values (np.ndarray): Z values for each corner point (distance from camera)
+    depth_map (np.ndarray): Depth map from the camera
+    min_x, min_y, width, height: Bounding box coordinates
+    
+    Returns:
+    int: Occlusion level (0: fully visible, 1: partly occluded, 2: largely occluded, 3: unknown)
+    """
+    # Bound check to prevent out-of-bounds indexing
+    h, w = depth_map.shape[:2]
+    
+    # Clip bounding box to image dimensions
+    min_x_c = max(0, min(min_x, w-1))
+    min_y_c = max(0, min(min_y, h-1))
+    max_x_c = max(0, min(min_x + width, w-1))
+    max_y_c = max(0, min(min_y + height, h-1))
+    
+    # If bounding box is outside the image, return unknown occlusion
+    if min_x_c >= max_x_c or min_y_c >= max_y_c:
+        return 3  # Unknown
+        
+    # Calculate expected depth of the object
+    valid_z = [z for z in z_values if z > 0]
+    if not valid_z:
+        return 3  # Unknown - no valid depth values
+        
+    expected_depth = np.mean(valid_z)
+    
+    # Sample points within the bounding box
+    visible_vertices = 0
+    total_sampled_points = 0
+    occluded_points = 0
+    
+    # Check occlusion for each vertex
+    for i, point in enumerate(points):
+        x, y = point
+        if 0 <= x < w and 0 <= y < h:
+            # Get actual depth at this pixel
+            actual_depth = depth_map[y, x]
+            #print(f"Point {i}: ({x}, {y}), Actual Depth: {actual_depth}, Expected Depth: {expected_depth}")
+            
+            # If the actual depth is significantly less than the expected depth, the vertex is occluded
+            if actual_depth > 0 and actual_depth < z_values[i] - 1.0:
+                occluded_points += 1
+            else:
+                visible_vertices += 1
+                
+            total_sampled_points += 1
+    
+    # Also sample some points inside the bounding box
+    num_samples = min(25, (max_x_c - min_x_c) * (max_y_c - min_y_c) // 20)
+    if num_samples > 0:
+        x_samples = np.random.randint(min_x_c, max_x_c, num_samples)
+        y_samples = np.random.randint(min_y_c, max_y_c, num_samples)
+        
+        for i in range(num_samples):
+            x, y = x_samples[i], y_samples[i]
+            actual_depth = depth_map[y, x]
+            
+            # We use expected_depth for interior points
+            if actual_depth > 0 and actual_depth < expected_depth - 1.0:
+                occluded_points += 1
+                
+            total_sampled_points += 1
+    
+    # Calculate occlusion percentage
+    if total_sampled_points > 0:
+        occlusion_percentage = occluded_points / total_sampled_points
+        
+        # Determine occlusion level
+        if occlusion_percentage < 0.5:
+            return 0  # Fully visible
+        elif occlusion_percentage < 0.8:
+            return 1  # Partly occluded
+        else:
+            return 2  # Largely occluded
+    
+    # If we can't determine occlusion level due to insufficient data
+    if visible_vertices >= MIN_VISIBLE_VERTICES_FOR_RENDER:
+        return 0  # Assume visible if we have enough visible vertices
+    else:
+        return 3  # Unknown
 
 def get_2d_bounding_box(points):
     sorted_points = sort_points_clockwise(points)
