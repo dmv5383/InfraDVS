@@ -29,13 +29,13 @@ read_scenario() {
     fi
     sudo docker container restart ${container_name}
     sleep 5
-    read_output=$(python3 ./read_scenario.py --world_map "$1" --world_weather "$2" --record_delta_time "$3" --start_time "$4" --sensors_config "$5" --record_path "$6" --tick_rate "$tick_rate" --out_path datasets/data/)
+    read_output=$(python3 ./read_scenario.py --world_map "$1" --world_weather "$2" --record_delta_time "$3" --start_time "$4" --sensors_config "$5" --record_path "$6" --tick_rate "$tick_rate" --out_path datasets/data/ 2>&1)
     search_string="RuntimeError"
     while echo "$read_output" | grep -q "$search_string"; do
         echo "Error reading scenario, trying again"
         sudo docker container restart ${container_name}
         sleep 5
-        read_output=$(python3 ./read_scenario.py --world_map "$1" --world_weather "$2" --record_delta_time "$3" --start_time "$4" --sensors_config "$5" --record_path "$6" --tick_rate "$tick_rate" --out_path datasets/data/)    done 
+        read_output=$(python3 ./read_scenario.py --world_map "$1" --world_weather "$2" --record_delta_time "$3" --start_time "$4" --sensors_config "$5" --record_path "$6" --tick_rate "$tick_rate" --out_path datasets/data/ 2>&1) 
     done
     sleep 5
 }
