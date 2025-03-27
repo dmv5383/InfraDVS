@@ -248,7 +248,8 @@ def get_bboxes_2d(sensor: Any, depth: np.ndarray, world: Any) -> List:
         if occlusion_status < 2:
             # Only add bounding box if it's not largely occluded
             bounding_boxes.append((vehicle.id, vehicle.attributes.get("base_type"),
-                                (min_x, min_y, xdiff, ydiff), bbox[0]))
+                                (min_x, min_y, xdiff, ydiff), 
+                                [(int(bbox[0][i, 0]), int(bbox[0][i, 1]), int(bbox[0][i,2])) for i in range(8)]))
             #print(f"Vehicle {vehicle.id} is visible, adding bounding box.")
         #else:
             #print(f"Vehicle {vehicle.id} is largely occluded, skipping bounding box.")
@@ -273,7 +274,8 @@ def get_bboxes_2d(sensor: Any, depth: np.ndarray, world: Any) -> List:
         if occlusion_status < 2:
             # Only add bounding box if it's not largely occluded
             bounding_boxes.append((ped.id, "pedestrian",
-                                (min_x, min_y, xdiff, ydiff), bbox[0]))
+                                (min_x, min_y, xdiff, ydiff),
+                                [(int(bbox[0][i, 0]), int(bbox[0][i, 1]), int(bbox[0][i,2])) for i in range(8)]))
             #print(f"Pedestrian {ped.id} is visible, adding bounding box.")
         #else:
             #print(f"Pedestrian {ped.id} is largely occluded, skipping bounding box.")
