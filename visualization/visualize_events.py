@@ -2,6 +2,7 @@ import os
 import cv2
 import numpy as np
 import json
+from tqdm import tqdm
 
 events_directory_1 = "datasets/data/Town10HD_MidRainSunset_1/infra_events_1"
 images_directory = "datasets/data/Town10HD_MidRainSunset_1/infra_rgb_1"
@@ -28,8 +29,7 @@ def draw_bounding_boxes(image, json_path):
             try:
                 data = json.load(json_file)
                 for annotation in data['annotations']:
-                    # bbox = annotation['bbox_2d']
-                    bbox = annotation['bbox']
+                    bbox = annotation['bbox_2d']
                     x, y, w, h = bbox
                     cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 1)
                     category_id = annotation['category_id']
