@@ -2,3 +2,4 @@ create_out.log
 __pycache__/
 datasets/data/
 datasets/scenarios/
+visualization/Intersection_32_Beam.pcd

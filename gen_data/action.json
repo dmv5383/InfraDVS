@@ -1,0 +1,52 @@
+[
+    {
+        "name": "infra_events_1",
+        "type": "sensor.camera.dvs",
+        "options": {
+            "positive_threshold": "0.5",
+            "negative_threshold": "0.4",
+            "sensor_tick": "0.001",
+            "image_size_x": "1280",
+            "image_size_y": "720"
+        },
+        "transform": {
+            "location": {
+                "x": -62.91912841796875,
+                "y": 37.753868103027344,
+                "z": 3.3
+            },
+            "rotation": {
+                "pitch": -5.270166873931885,
+                "yaw": -48.51167678833008,
+                "roll": 0.00010610301251290366
+            }
+        },
+        "converter": null,
+        "is_static": true
+    },
+    {
+        "name": "infra_events_2",
+        "type": "sensor.camera.dvs",
+        "options": {
+            "positive_threshold": "0.5",
+            "negative_threshold": "0.4",
+            "sensor_tick": "0.001",
+            "image_size_x": "1280",
+            "image_size_y": "720"
+        },
+        "transform": {
+            "location": {
+                "x": -32.229591369628906,
+                "y": 38.47526168823242,
+                "z": 3.3
+            },
+            "rotation": {
+                "pitch": -10.264100074768066,
+                "yaw": -131.34091186523438,
+                "roll": 0.0001262443547602743
+            }
+        },
+        "converter": null,
+        "is_static": true
+    }
+]
