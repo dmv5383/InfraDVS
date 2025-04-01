@@ -21,23 +21,35 @@ create_scenario() {
 }
 
 # Function to read a scenario
-read_scenario() {
+read_action_camera() {
     local tick_rate
-    if [[ "$5" == "./gen_data/camera_sensors.json" ]]; then
-        tick_rate=0.001
-    else
-        tick_rate=0.1
-    fi
     sudo docker container restart ${container_name}
     sleep 5
-    read_output=$(python3 ./read_scenario.py --world_map "$1" --world_weather "$2" --record_delta_time "$3" --start_time "$4" --sensors_config "$5" --record_path "$6" --tick_rate "$tick_rate" --out_path datasets/data/ 2>&1)
+    read_output=$(python3 ./read_scenario.py --world_map "$1" --world_weather "$2" --record_delta_time "$3" --start_time "$4" --sensors_config "$5" --record_path "$6" --tick_rate "0.001" --out_path datasets/data/ 2>&1)
     search_string="RuntimeError"
     echo "$read_output"
     while echo "$read_output" | grep -q "$search_string"; do
         echo "Error reading scenario, trying again"
         sudo docker container restart ${container_name}
         sleep 5
-        read_output=$(python3 ./read_scenario.py --world_map "$1" --world_weather "$2" --record_delta_time "$3" --start_time "$4" --sensors_config "$5" --record_path "$6" --tick_rate "$tick_rate" --out_path datasets/data/ 2>&1) 
+        read_output=$(python3 ./read_scenario.py --world_map "$1" --world_weather "$2" --record_delta_time "$3" --start_time "$4" --sensors_config "$5" --record_path "$6" --tick_rate "0.001" --out_path datasets/data/ 2>&1) 
+    done
+    sleep 5
+}
+
+# Function to read a scenario
+read_rgb() {
+    local tick_rate
+    sudo docker container restart ${container_name}
+    sleep 5
+    read_output=$(python3 ./read_scenario.py --world_map "$1" --world_weather "$2" --record_delta_time "$3" --start_time "$4" --sensors_config "$5" --record_path "$6" --tick_rate "0.04" --out_path datasets/data/ 2>&1)
+    search_string="RuntimeError"
+    echo "$read_output"
+    while echo "$read_output" | grep -q "$search_string"; do
+        echo "Error reading scenario, trying again"
+        sudo docker container restart ${container_name}
+        sleep 5
+        read_output=$(python3 ./read_scenario.py --world_map "$1" --world_weather "$2" --record_delta_time "$3" --start_time "$4" --sensors_config "$5" --record_path "$6" --tick_rate "0.001" --out_path datasets/data/ 2>&1) 
     done
     sleep 5
 }
@@ -103,10 +115,10 @@ for wm in "${world_map[@]}"; do
                                 record_path="/home/carla/datasets/scenarios/${wm}_${ww}_${rn}.log"
 
                                 # Run read_scenario with camera_sensors.json
-                                read_scenario "$wm" "$ww" "$rdt" "$st" "./gen_data/camera_sensors.json" "$record_path"
+                                read_action_camera "$wm" "$ww" "$rdt" "$st" "./gen_data/action.json" "$record_path"
 
                                 # Run read_scenario with lidar_sensors.json
-                                #read_scenario "$wm" "$ww" "$rdt" "$st" "./gen_data/lidar_sensors.json" "$record_path"
+                                read_rgb "$wm" "$ww" "$rdt" "$st" "./gen_data/rgb.json" "$record_path"
                             done
                         done
                     done

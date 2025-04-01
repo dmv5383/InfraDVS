@@ -418,10 +418,6 @@ def create_kitti_datapoint_lidar(actor, sensor, point_cloud):
     # Get actor's bounding box in LiDAR sensor space
     bbox = ClientSideBoundingBoxes.get_bounding_box_lidar(actor, sensor)
     
-    # Check if the bounding box is within sensor's view (all points have positive x value in LiDAR space)
-    if not np.all(bbox[0, :] > 0):  # Use np.all() instead of all()
-        return None
-    
     # Filter points that are inside the bounding box
     points_in_bbox = points_in_bounding_box(point_cloud, bbox)
     

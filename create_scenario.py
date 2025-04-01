@@ -1,7 +1,12 @@
 import carla
 import os
 import argparse
+import random
 from create import CreateScenario
+
+spawn_indices = [126, 105, 93, 112, 153, 95, 47, 48]
+spawn_point = random.choice(spawn_indices)
+print(f"Spawn point: {spawn_point}")
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Create a CARLA scenario.")
@@ -9,8 +14,8 @@ def parse_arguments():
     parser.add_argument("--world_weather", type=str, default="ClearNoon", help="The weather condition to use.")
     parser.add_argument("--run_number", type=int, default=1, help="The run number for the scenario.")
     parser.add_argument("--out_path", type=str, default="datasets/data/", help="The output path for the LIDAR sensor.")
-    parser.add_argument("--record_start_time", type=int, default=10, help="How long into the simulation the recording begins.")
-    parser.add_argument("--record_delta_time", type=int, default=60, help="The length of the recording.")
+    parser.add_argument("--record_start_time", type=float, default=0.5, help="How long into the simulation the recording begins.")
+    parser.add_argument("--record_delta_time", type=float, default=10, help="The length of the recording.")
     parser.add_argument("--num_vehicles", type=int, default=20, help="The number of vehicles in the scenario.")
     parser.add_argument("--num_peds", type=int, default=20, help="The number of pedestrians in the scenario.")
     return parser.parse_args()
@@ -33,7 +38,8 @@ if __name__ == "__main__":
 
     vehicles = [
         {"role_name": "ego_vehicle",
-         "type": "vehicle.nissan.patrol"
+         "type": "vehicle.nissan.patrol",
+         "spawn_point": spawn_point
          }
     ]
 

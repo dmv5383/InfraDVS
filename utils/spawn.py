@@ -33,14 +33,14 @@ class VehicleSpawner():
         ]
 
         self.spawn_points = self.map.get_spawn_points()
-        np.random.shuffle(self.spawn_points)
 
         for i, vehicle_info in enumerate(vehicles):
             if i >= len(self.spawn_points):
                 break
 
             if "spawn_point" in vehicle_info:
-                point = vehicle_info["spawn_point"]
+                point_index = vehicle_info["spawn_point"]
+                point = self.spawn_points[point_index]
             else:
                 point = self.spawn_points[i]
 
