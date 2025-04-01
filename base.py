@@ -2,11 +2,14 @@ import json
 import os
 import carla
 import time
+import tqdm
 
 from utils import extract
 from utils.sensor import Sensor
 
 from typing import Any, Dict, Tuple
+from tqdm import tqdm
+from datetime import timedelta  # Add this import
 
 from utils.writer import Writer
 
@@ -150,3 +153,19 @@ class ScenarioBase():
                 sensor.depth_camera.get_obj().destroy()
             sensor.get_obj().destroy()
         print('Destroyed Sensors')
+
+    def _print_status(self, frame: int, end_frame: int, data: Dict[str, Any], sim_time: float, real_time: float, progress_bar: tqdm) -> None:
+        """
+        Updates the status with a progress bar and sensor data status.
+        """
+        # Format sensor status for better readability
+        #sensor_status = {sensor_name: ("✔" if info is not None else "✘") for sensor_name, info in data.items()}
+        #formatted_sensor_status = ", ".join([f"{sensor_name}: {status}" for sensor_name, status in sensor_status.items()])
+
+        # Update the progress bar with formatted information
+        progress_bar.set_postfix({
+            "Sim Time": str(timedelta(seconds=sim_time)),
+            "Real Time": str(timedelta(seconds=real_time))#,
+            #"Sensors": formatted_sensor_status
+        })
+        progress_bar.update(1)

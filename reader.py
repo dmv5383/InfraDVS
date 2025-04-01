@@ -12,6 +12,7 @@ from utils.writer import Writer
 
 from datetime import timedelta
 from typing import Any, Dict, Tuple
+from tqdm import tqdm
 
 class ScenarioReader(ScenarioBase):
     def __init__(
@@ -59,30 +60,43 @@ class ScenarioReader(ScenarioBase):
             self.sim_time = 0.0
             self.real_time = time.time()
 
+            # Initialize progress bar
+            initial_frame = self.world.get_snapshot().frame
+            end_frame = initial_frame + int(self.record_delta_time / self.tick_rate)
+            progress_bar = tqdm(total=end_frame - initial_frame, desc="Replay Progress", unit="frame")
+
             with SensorSync(
                 world=self.world, sensors=self.active_sensors,
                 start_time=self.start_time, tick_rate=self.tick_rate
             ) as sensor_sync:
                 while True:
                     data = sensor_sync.tick(timeout=5.0)
-                    print("=====", "Frame ID:", data["world"], "=====")
                     data = self._extract_data(data)
-                    self._print_data(data)
-                    print("Sim Time:", str(timedelta(seconds=self.sim_time)))
-                    print("Real Time:", str(timedelta(seconds=time.time() - self.real_time)))
+
+                    # Update status
+                    self._print_status(
+                        frame=data["world"],
+                        end_frame=end_frame,
+                        data=data,
+                        sim_time=self.sim_time,
+                        real_time=time.time() - self.real_time,
+                        progress_bar=progress_bar
+                    )
+
+                    # Save data
                     self._save_data(data, data["world"], self.world)
 
+                    # Update simulation time
                     self.sim_time += self.tick_rate
                     if self.sim_time > (self.record_delta_time - self.start_time):
-                        return
+                        break
         except Exception as e:
             print("Error:", e)
             print(traceback.format_exc())
         finally:
+            progress_bar.close()
             self._reset_settings()
             self._destroy_sensors()
             self._destroy_actors()
             print("Actors destroyed.")
             print("All simulation elements reset.")
-            #print("# === Mapping Data === #")
-            #self._map_data()

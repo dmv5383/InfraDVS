@@ -1,9 +1,10 @@
 import os
 import cv2
 import numpy as np
+from tqdm import tqdm  # Import tqdm for the progress bar
 
-events_directory_1 = "Independent_Study/visualization/test_data/data/Untitled/infra_events_1/"
-images_directory = "Independent_Study/visualization/test_data/data/Untitled/infra_rgb_1/"
+events_directory_1 = "datasets/data/Town10HD_MidRainSunset_1/infra_events_1"
+images_directory = "datasets/data/Town10HD_MidRainSunset_1/infra_rgb_1"
 frame_rate = 1000  # Configurable frame rate in frames per second
 output_video_path = "output_video.mp4"  # Path to save the output video
 write_to_video = True  # Flag to write to video instead of visualizing
@@ -21,7 +22,7 @@ if write_to_video:
     video_writer = cv2.VideoWriter(output_video_path, fourcc, frame_rate, (2560, 720))  # Adjust the frame size as needed
 
 # Loop through each event file and display the events and images
-for event_file in png_files_1:
+for event_file in tqdm(png_files_1, desc="Event Files", unit="file"):  # Add tqdm progress bar
     event_base = event_file.split('_')[0]
     event_path = os.path.join(events_directory_1, event_file)
     image_path = os.path.join(images_directory, f"{event_base}_img.png")

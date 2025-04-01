@@ -3,3 +3,4 @@ __pycache__/
 datasets/data/
 datasets/scenarios/
 visualization/Intersection_32_Beam.pcd
+output_video.mp4
