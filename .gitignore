@@ -3,3 +3,8 @@ __pycache__/
 datasets/data/
 datasets/scenarios/
 visualization/Intersection_32_Beam.pcd
+data/
+datasets/
+outputFunTimes/
+datasets.tar
+gen_data/build/funtimes.csv
