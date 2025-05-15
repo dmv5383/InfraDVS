@@ -8,3 +8,4 @@ datasets/
 outputFunTimes/
 datasets.tar
 gen_data/build/funtimes.csv
+output_video.mp4
