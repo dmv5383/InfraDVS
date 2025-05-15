@@ -1,5 +1,5 @@
 world_map=Town10HD
-world_weather=ClearNoon,WetNoon,HardRainNoon,SoftRainNoon,ClearSunset,WetSunset,HardRainSunset,SoftRainSunset
+world_weather=SoftRainSunset
 run_number=1
 record_start_time=0
 record_delta_time=30

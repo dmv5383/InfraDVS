@@ -422,7 +422,7 @@ def create_kitti_datapoint_lidar(actor, sensor, point_cloud):
     points_in_bbox = points_in_bounding_box(point_cloud, bbox)
     
     # If no points detected, the object is not visible to LiDAR
-    if len(points_in_bbox) < 1:  # Threshold can be adjusted
+    if len(points_in_bbox) < 1:  # Threshold
         return None
     
     # Create KITTI descriptor

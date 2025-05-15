@@ -58,3 +58,6 @@ Kill the Docker container
 To call the script use:
 - bash ./gen_data/gen_data.sh ./gen_data/scenario_config.txt
   - Need's to be changed
+
+
+  python3 ./read_scenario.py --world_map Town10HD --world_weather SoftRainSunset --record_delta_time 30 --start_time 0.04 --tick_rate 0.04 --sensors_config gen_data/rgb.json --record_path /home/carla/datasets/scenarios/Town10HD_SoftRainSunset_1.log
